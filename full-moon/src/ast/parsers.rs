@@ -221,7 +221,7 @@ fn parse_stmt(state: &mut ParserState) -> ParserResult<StmtVariant> {
                 _ => {
                     state.token_error(
                         next_token.clone(),
-                        "expected either a variable name or `function`",
+                        "expected either a variable name or `function` after `const`",
                     );
 
                     ParserResult::LexerMoved
@@ -872,11 +872,10 @@ fn expect_function_declaration(
     })
 }
 
-fn expect_local_function_declaration(
+fn expect_function_name_and_body(
     state: &mut ParserState,
-    local_token: TokenReference,
-    function_token: TokenReference,
-) -> Result<ast::LocalFunction, ()> {
+    function_token: &TokenReference,
+) -> Result<(TokenReference, ast::FunctionBody), ()> {
     let function_name = match state.current() {
         Ok(token) if token.token_kind() == TokenKind::Identifier => state.consume().unwrap(),
 
@@ -891,11 +890,21 @@ fn expect_local_function_declaration(
     let function_body = match parse_function_body(state) {
         ParserResult::Value(function_body) => function_body,
         ParserResult::NotFound => {
-            state.token_error(function_token, "expected a function body");
+            state.token_error(function_token.clone(), "expected a function body");
             return Err(());
         }
         ParserResult::LexerMoved => return Err(()),
     };
+
+    Ok((function_name, function_body))
+}
+
+fn expect_local_function_declaration(
+    state: &mut ParserState,
+    local_token: TokenReference,
+    function_token: TokenReference,
+) -> Result<ast::LocalFunction, ()> {
+    let (function_name, function_body) = expect_function_name_and_body(state, &function_token)?;
 
     Ok(ast::LocalFunction {
         #[cfg(feature = "luau")]
@@ -1357,25 +1366,7 @@ fn expect_const_function_declaration(
     const_token: TokenReference,
     function_token: TokenReference,
 ) -> Result<ast::ConstFunction, ()> {
-    let function_name = match state.current() {
-        Ok(token) if token.token_kind() == TokenKind::Identifier => state.consume().unwrap(),
-
-        Ok(token) => {
-            state.token_error(token.clone(), "expected a function name");
-            return Err(());
-        }
-
-        Err(()) => return Err(()),
-    };
-
-    let function_body = match parse_function_body(state) {
-        ParserResult::Value(function_body) => function_body,
-        ParserResult::NotFound => {
-            state.token_error(function_token, "expected a function body");
-            return Err(());
-        }
-        ParserResult::LexerMoved => return Err(()),
-    };
+    let (function_name, function_body) = expect_function_name_and_body(state, &function_token)?;
 
     Ok(ast::ConstFunction {
         attributes: Vec::new(),
