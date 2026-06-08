@@ -18,8 +18,8 @@ nodes:
                 line: 1
                 character: 6
               token_type:
-                type: Identifier
-                identifier: const
+                type: Symbol
+                symbol: const
             trailing_trivia:
               - start_position:
                   bytes: 5
