@@ -18,61 +18,86 @@ lockfile = true
 
 [tasks]
 [tasks.build]
-description = "Build all workspace crates in release mode"
-run = "cargo build --release"
-sources = ["**/*.rs", "**/Cargo.toml", "**/Cargo.lock"]
-
-[tasks.build-dev]
-description = "Build all workspace crates in debug mode (fast compile)"
-run = "cargo build"
+description = "Build workspace crates"
+usage = '''
+arg "[features]" default="luau,lua52,lua53,lua54,luajit,cfxlua" help="Cargo features (comma-separated)"
+flag "-r --release" help="Build in release mode"
+complete "features" run="echo luau lua52 lua53 lua54 luajit cfxlua | tr ' ' '\n'"
+'''
+run = "cargo build ${usage_release:+--release} --features ${usage_features?}"
 sources = ["**/*.rs", "**/Cargo.toml", "**/Cargo.lock"]
 
 [tasks.format]
-description = "Check formatting with rustfmt. Exits non-zero if unformatted."
+description = "Check formatting. Exits non-zero if unformatted."
 run = "cargo fmt --all -- --check"
 sources = ["**/*.rs"]
 
 [tasks.format-fix]
-description = "Apply rustfmt formatting to all crates"
+description = "Apply rustfmt to all crates"
 run = "cargo fmt --all"
 
 [tasks.lint]
-description = "Run Clippy with all features and targets. Fails on any warning."
+description = "Run Clippy on all targets with all features. Fails on any warning."
 run = "cargo clippy --all-targets --all-features -- -D warnings"
 sources = ["**/*.rs", "**/Cargo.toml"]
 
 [tasks.test]
-description = "Run the full test suite with all features via nextest"
-run = "cargo nextest run --all-features"
+description = "Run tests via cargo nextest"
+usage = '''
+arg "[features]" default="luau,lua52,lua53,lua54,luajit,cfxlua" help="Cargo features (comma-separated)"
+complete "features" run="echo luau lua52 lua53 lua54 luajit cfxlua | tr ' ' '\n'"
+'''
+run = "cargo nextest run --features ${usage_features?}"
 sources = ["**/*.rs", "**/Cargo.toml", "**/tests/**/*.rs"]
 
 [tasks.test-std]
-description = "Run tests with standard cargo test runner (no nextest required)"
-run = "cargo test --all-features"
-sources = ["**/*.rs", "**/Cargo.toml", "**/tests/**/*.rs"]
+description = "Run tests with standard cargo test runner"
+usage = '''
+arg "[features]" default="luau,lua52,lua53,lua54,luajit,cfxlua" help="Cargo features (comma-separated)"
+complete "features" run="echo luau lua52 lua53 lua54 luajit cfxlua | tr ' ' '\n'"
+'''
+run = "cargo test --features ${usage_features?}"
 
 [tasks.snapshots]
-description = "Review and accept insta snapshot changes interactively"
-run = "cargo insta review"
+description = "Interactively review and accept insta snapshot changes"
+run = "cargo insta review --workspace-root {{config_root}}"
+raw = true
+
+[tasks.snapshots-update]
+description = "Bulk-accept all insta snapshot changes"
+usage = '''
+arg "[features]" default="luau,lua52,lua53,lua54,luajit,cfxlua" help="Cargo features"
+complete "features" run="echo luau lua52 lua53 lua54 luajit cfxlua | tr ' ' '\n'"
+'''
+run = "INSTA_UPDATE=always cargo test --features ${usage_features?}"
 
 [tasks.doc]
-description = "Build rustdoc with all Lua dialect features enabled (docs.rs parity)"
-run = "RUSTDOCFLAGS='--cfg docsrs' cargo doc --features luau,lua52,lua53,lua54,luajit,cfxlua --no-deps"
+description = "Build rustdoc with cfg docsrs"
+usage = '''
+arg "[features]" default="luau,lua52,lua53,lua54,luajit,cfxlua" help="Cargo features"
+complete "features" run="echo luau lua52 lua53 lua54 luajit cfxlua | tr ' ' '\n'"
+'''
+run = "RUSTDOCFLAGS='--cfg docsrs' cargo doc --features ${usage_features?} --no-deps"
 sources = ["**/*.rs", "**/Cargo.toml"]
 
 [tasks.doc-open]
 description = "Build docs and open in browser"
-run = "RUSTDOCFLAGS='--cfg docsrs' cargo doc --features luau,lua52,lua53,lua54,luajit,cfxlua --no-deps --open"
-sources = ["**/*.rs", "**/Cargo.toml"]
+usage = '''
+arg "[features]" default="luau,lua52,lua53,lua54,luajit,cfxlua" help="Cargo features"
+complete "features" run="echo luau lua52 lua53 lua54 luajit cfxlua | tr ' ' '\n'"
+'''
+run = "RUSTDOCFLAGS='--cfg docsrs' cargo doc --features ${usage_features?} --no-deps --open"
 
 [tasks.fuzz-parse]
-description = "Fuzz the parser target (30s timeout per run)"
-run = "cargo fuzz run parse -- -max_total_time=30"
+description = "Fuzz the parser target"
+usage = 'flag "-t --timeout <seconds>" default="30" help="Max total seconds per run"'
+run = "cargo fuzz run parse -- -max_total_time=${usage_timeout?}"
 dir = "full-moon/fuzz"
 
 [tasks.fuzz-parity]
-description = "Fuzz the parser parity target (compare against old full_moon)"
-run = "cargo fuzz run parse_parity -- -max_total_time=30"
+description = "Fuzz the parser parity target"
+usage = 'flag "-t --timeout <seconds>" default="30" help="Max total seconds per run"'
+run = "cargo fuzz run parse_parity -- -max_total_time=${usage_timeout?}"
 dir = "full-moon/fuzz"
 
 [tasks.fuzz]
@@ -85,9 +110,9 @@ run = "cargo bench"
 sources = ["benches/**/*.rs", "benches/**/*.lua"]
 
 [tasks.verify]
-description = "Full local verification: format check + lint + test + build"
+description = "Pre-push: format check + lint + test + build"
 depends = ["format", "lint", "test", "build"]
 
 [tasks.ci]
-description = "CI pipeline: format + lint + test + build + doc"
+description = "Full CI: format + lint + test + build + doc"
 depends = ["format", "lint", "test", "build", "doc"]
