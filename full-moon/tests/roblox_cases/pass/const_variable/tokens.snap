@@ -12,8 +12,8 @@ input_file: full-moon/tests/roblox_cases/pass/const_variable
     line: 1
     character: 6
   token_type:
-    type: Symbol
-    symbol: const
+    type: Identifier
+    identifier: const
 - start_position:
     bytes: 5
     line: 1
@@ -100,8 +100,8 @@ input_file: full-moon/tests/roblox_cases/pass/const_variable
     line: 2
     character: 6
   token_type:
-    type: Symbol
-    symbol: const
+    type: Identifier
+    identifier: const
 - start_position:
     bytes: 17
     line: 2
@@ -232,8 +232,8 @@ input_file: full-moon/tests/roblox_cases/pass/const_variable
     line: 3
     character: 6
   token_type:
-    type: Symbol
-    symbol: const
+    type: Identifier
+    identifier: const
 - start_position:
     bytes: 42
     line: 3
@@ -408,8 +408,8 @@ input_file: full-moon/tests/roblox_cases/pass/const_variable
     line: 4
     character: 6
   token_type:
-    type: Symbol
-    symbol: const
+    type: Identifier
+    identifier: const
 - start_position:
     bytes: 62
     line: 4
@@ -529,8 +529,8 @@ input_file: full-moon/tests/roblox_cases/pass/const_variable
     line: 5
     character: 6
   token_type:
-    type: Symbol
-    symbol: const
+    type: Identifier
+    identifier: const
 - start_position:
     bytes: 82
     line: 5
@@ -683,8 +683,8 @@ input_file: full-moon/tests/roblox_cases/pass/const_variable
     line: 6
     character: 6
   token_type:
-    type: Symbol
-    symbol: const
+    type: Identifier
+    identifier: const
 - start_position:
     bytes: 100
     line: 6
@@ -904,8 +904,8 @@ input_file: full-moon/tests/roblox_cases/pass/const_variable
     line: 7
     character: 6
   token_type:
-    type: Symbol
-    symbol: const
+    type: Identifier
+    identifier: const
 - start_position:
     bytes: 140
     line: 7
@@ -1047,8 +1047,8 @@ input_file: full-moon/tests/roblox_cases/pass/const_variable
     line: 8
     character: 6
   token_type:
-    type: Symbol
-    symbol: const
+    type: Identifier
+    identifier: const
 - start_position:
     bytes: 167
     line: 8
@@ -1267,8 +1267,8 @@ input_file: full-moon/tests/roblox_cases/pass/const_variable
     line: 9
     character: 6
   token_type:
-    type: Symbol
-    symbol: const
+    type: Identifier
+    identifier: const
 - start_position:
     bytes: 196
     line: 9

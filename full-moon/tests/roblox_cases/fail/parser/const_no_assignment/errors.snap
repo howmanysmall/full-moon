@@ -14,8 +14,8 @@ input_file: full-moon/tests/roblox_cases/fail/parser/const_no_assignment
         line: 1
         character: 6
       token_type:
-        type: Symbol
-        symbol: const
+        type: Identifier
+        identifier: const
     additional: const declaration must have an assignment
     range:
       - bytes: 0

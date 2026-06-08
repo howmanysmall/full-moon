@@ -912,7 +912,13 @@ impl ConstAssignment {
     /// Returns a new ConstAssignment from the given name list
     pub fn new(name_list: Punctuated<TokenReference>) -> Self {
         Self {
-            const_token: TokenReference::symbol("const ").unwrap(),
+            const_token: TokenReference::new(
+                Vec::new(),
+                Token::new(TokenType::Identifier {
+                    identifier: "const".into(),
+                }),
+                vec![Token::new(TokenType::spaces(1))],
+            ),
             type_specifiers: Vec::new(),
             name_list,
             equal_token: None,
@@ -1021,7 +1027,13 @@ impl ConstFunction {
     pub fn new(name: TokenReference) -> Self {
         ConstFunction {
             attributes: Vec::new(),
-            const_token: TokenReference::symbol("const ").unwrap(),
+            const_token: TokenReference::new(
+                Vec::new(),
+                Token::new(TokenType::Identifier {
+                    identifier: "const".into(),
+                }),
+                vec![Token::new(TokenType::spaces(1))],
+            ),
             function_token: TokenReference::basic_symbol("function "),
             name,
             body: FunctionBody::new(),

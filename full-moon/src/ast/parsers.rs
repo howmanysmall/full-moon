@@ -186,9 +186,9 @@ fn parse_stmt(state: &mut ParserState) -> ParserResult<StmtVariant> {
         }
 
         #[cfg(feature = "luau")]
-        TokenType::Symbol {
-            symbol: Symbol::Const,
-        } if state.lua_version().has_luau() => {
+        TokenType::Identifier { identifier }
+            if identifier.as_str() == "const" && state.lua_version().has_luau() =>
+        {
             let const_token = state.consume().unwrap();
             let next_token = match state.current() {
                 Ok(token) => token,
@@ -705,7 +705,7 @@ fn parse_stmt(state: &mut ParserState) -> ParserResult<StmtVariant> {
                         Err(()) => ParserResult::LexerMoved,
                     }
                 }
-                Ok(token) if token.is_symbol(Symbol::Const) => {
+                Ok(token) if matches!(token.token_type(), TokenType::Identifier { identifier } if identifier.as_str() == "const") => {
                     let const_token = state.consume().unwrap();
                     match state.current() {
                         Ok(token) if token.is_symbol(Symbol::Function) => {

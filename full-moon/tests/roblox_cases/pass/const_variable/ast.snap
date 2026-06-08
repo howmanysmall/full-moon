@@ -17,8 +17,8 @@ stmts:
               line: 1
               character: 6
             token_type:
-              type: Symbol
-              symbol: const
+              type: Identifier
+              identifier: const
           trailing_trivia:
             - start_position:
                 bytes: 5
@@ -128,8 +128,8 @@ stmts:
               line: 2
               character: 6
             token_type:
-              type: Symbol
-              symbol: const
+              type: Identifier
+              identifier: const
           trailing_trivia:
             - start_position:
                 bytes: 17
@@ -304,8 +304,8 @@ stmts:
               line: 3
               character: 6
             token_type:
-              type: Symbol
-              symbol: const
+              type: Identifier
+              identifier: const
           trailing_trivia:
             - start_position:
                 bytes: 42
@@ -525,8 +525,8 @@ stmts:
               line: 4
               character: 6
             token_type:
-              type: Symbol
-              symbol: const
+              type: Identifier
+              identifier: const
           trailing_trivia:
             - start_position:
                 bytes: 62
@@ -679,8 +679,8 @@ stmts:
               line: 5
               character: 6
             token_type:
-              type: Symbol
-              symbol: const
+              type: Identifier
+              identifier: const
           trailing_trivia:
             - start_position:
                 bytes: 82
@@ -871,8 +871,8 @@ stmts:
               line: 6
               character: 6
             token_type:
-              type: Symbol
-              symbol: const
+              type: Identifier
+              identifier: const
           trailing_trivia:
             - start_position:
                 bytes: 100
@@ -1149,8 +1149,8 @@ stmts:
               line: 7
               character: 6
             token_type:
-              type: Symbol
-              symbol: const
+              type: Identifier
+              identifier: const
           trailing_trivia:
             - start_position:
                 bytes: 140
@@ -1338,8 +1338,8 @@ stmts:
               line: 8
               character: 6
             token_type:
-              type: Symbol
-              symbol: const
+              type: Identifier
+              identifier: const
           trailing_trivia:
             - start_position:
                 bytes: 167
@@ -1625,8 +1625,8 @@ stmts:
               line: 9
               character: 6
             token_type:
-              type: Symbol
-              symbol: const
+              type: Identifier
+              identifier: const
           trailing_trivia:
             - start_position:
                 bytes: 196

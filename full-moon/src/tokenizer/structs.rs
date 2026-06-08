@@ -110,7 +110,6 @@ symbol! {
         If => "if",
         In => "in",
         Local => "local",
-        [luau] Const => "const",
         Nil => "nil",
         Not => "not",
         Or => "or",

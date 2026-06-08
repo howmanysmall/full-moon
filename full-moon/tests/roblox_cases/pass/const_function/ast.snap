@@ -18,8 +18,8 @@ stmts:
               line: 1
               character: 6
             token_type:
-              type: Symbol
-              symbol: const
+              type: Identifier
+              identifier: const
           trailing_trivia:
             - start_position:
                 bytes: 5
@@ -162,8 +162,8 @@ stmts:
               line: 2
               character: 6
             token_type:
-              type: Symbol
-              symbol: const
+              type: Identifier
+              identifier: const
           trailing_trivia:
             - start_position:
                 bytes: 28
