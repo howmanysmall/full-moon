@@ -914,8 +914,8 @@ impl ConstAssignment {
         Self {
             const_token: TokenReference::new(
                 Vec::new(),
-                Token::new(TokenType::Identifier {
-                    identifier: "const".into(),
+                Token::new(TokenType::Symbol {
+                    symbol: Symbol::Const,
                 }),
                 vec![Token::new(TokenType::spaces(1))],
             ),
@@ -1029,8 +1029,8 @@ impl ConstFunction {
             attributes: Vec::new(),
             const_token: TokenReference::new(
                 Vec::new(),
-                Token::new(TokenType::Identifier {
-                    identifier: "const".into(),
+                Token::new(TokenType::Symbol {
+                    symbol: Symbol::Const,
                 }),
                 vec![Token::new(TokenType::spaces(1))],
             ),

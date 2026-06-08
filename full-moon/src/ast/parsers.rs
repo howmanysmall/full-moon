@@ -174,6 +174,50 @@ fn parse_stmt(state: &mut ParserState) -> ParserResult<StmtVariant> {
                     ParserResult::Value(StmtVariant::Stmt(ast::Stmt::LocalFunction(local_function)))
                 }
 
+          _ => {
+                    state.token_error(
+                        next_token.clone(),
+                        "expected either a variable name or `function`",
+                    );
+
+                    ParserResult::LexerMoved
+                }
+            }
+        }
+
+        #[cfg(feature = "luau")]
+        TokenType::Symbol {
+            symbol: Symbol::Const,
+        } if state.lua_version().has_luau() => {
+            let const_token = state.consume().unwrap();
+            let next_token = match state.current() {
+                Ok(token) => token,
+                Err(()) => return ParserResult::LexerMoved,
+            };
+
+            match next_token.token_type() {
+                TokenType::Identifier { .. } => ParserResult::Value(StmtVariant::Stmt(
+                    ast::Stmt::ConstAssignment(match expect_const_assignment(state, const_token) {
+                        Ok(const_assignment) => const_assignment,
+                        Err(()) => return ParserResult::LexerMoved,
+                    }),
+                )),
+
+                TokenType::Symbol {
+                    symbol: Symbol::Function,
+                } => {
+                    let function_token = state.consume().unwrap();
+
+                    let const_function =
+                        match expect_const_function_declaration(state, const_token, function_token)
+                        {
+                            Ok(const_function) => const_function,
+                            Err(()) => return ParserResult::LexerMoved,
+                        };
+
+                    ParserResult::Value(StmtVariant::Stmt(ast::Stmt::ConstFunction(const_function)))
+                }
+
                 _ => {
                     state.token_error(
                         next_token.clone(),
@@ -431,60 +475,6 @@ fn parse_stmt(state: &mut ParserState) -> ParserResult<StmtVariant> {
                                         ast::LastStmt::Continue(continue_token),
                                     ));
                                 }
-                                TokenType::Identifier { identifier }
-                                    if identifier.as_str() == "const" =>
-                                {
-                                    let const_token = token;
-
-                                    let next_token_type = match state.current() {
-                                        Ok(next) => next.token_type().clone(),
-                                        Err(()) => return ParserResult::LexerMoved,
-                                    };
-
-                                    match next_token_type {
-                                        TokenType::Identifier { .. } => {
-                                            return ParserResult::Value(StmtVariant::Stmt(
-                                                ast::Stmt::ConstAssignment(
-                                                    match expect_const_assignment(
-                                                        state,
-                                                        const_token,
-                                                    ) {
-                                                        Ok(ca) => ca,
-                                                        Err(()) => return ParserResult::LexerMoved,
-                                                    },
-                                                ),
-                                            ));
-                                        }
-
-                                        TokenType::Symbol {
-                                            symbol: Symbol::Function,
-                                        } => {
-                                            let function_token = state.consume().unwrap();
-                                            let const_function =
-                                                match expect_const_function_declaration(
-                                                    state,
-                                                    const_token,
-                                                    function_token,
-                                                ) {
-                                                    Ok(cf) => cf,
-                                                    Err(()) => return ParserResult::LexerMoved,
-                                                };
-                                            return ParserResult::Value(StmtVariant::Stmt(
-                                                ast::Stmt::ConstFunction(const_function),
-                                            ));
-                                        }
-
-                                        _ => {
-                                            if let Ok(t) = state.current() {
-                                                state.token_error(
-                                                    t.clone(),
-                                                    "expected a variable name or `function` after `const`",
-                                                );
-                                            }
-                                            return ParserResult::LexerMoved;
-                                        }
-                                    }
-                                }
                                 _ => (),
                             }
                         }
@@ -715,8 +705,7 @@ fn parse_stmt(state: &mut ParserState) -> ParserResult<StmtVariant> {
                         Err(()) => ParserResult::LexerMoved,
                     }
                 }
-                Ok(token) if matches!(token.token_type(), TokenType::Identifier { identifier } if identifier.as_str() == "const") =>
-                {
+                Ok(token) if token.is_symbol(Symbol::Const) => {
                     let const_token = state.consume().unwrap();
                     match state.current() {
                         Ok(token) if token.is_symbol(Symbol::Function) => {
