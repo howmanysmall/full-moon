@@ -87,11 +87,7 @@ pub fn join_iterators<
 ) -> String {
     let mut string = String::new();
 
-    for ((name, item1), item2) in parameters
-        .pairs()
-        .zip(first_iterator.into_iter())
-        .zip(second_iterator.into_iter())
-    {
+    for ((name, item1), item2) in parameters.pairs().zip(first_iterator).zip(second_iterator) {
         let _ = write!(
             string,
             "{}{}{}{}",

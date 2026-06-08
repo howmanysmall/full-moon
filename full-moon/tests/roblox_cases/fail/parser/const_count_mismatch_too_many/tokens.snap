@@ -12,8 +12,8 @@ input_file: full-moon/tests/roblox_cases/fail/parser/const_count_mismatch_too_ma
     line: 1
     character: 6
   token_type:
-    type: Identifier
-    identifier: const
+    type: Symbol
+    symbol: const
 - start_position:
     bytes: 5
     line: 1

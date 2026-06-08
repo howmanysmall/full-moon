@@ -1,0 +1,118 @@
+min_version = "2024.11.0"
+
+[tools]
+rust = "1.93.1"
+oxfmt = "0.54.0"
+cargo-binstall = "latest"
+"cargo:cargo-insta" = "latest"
+"cargo:cargo-nextest" = "latest"
+"cargo:cargo-fuzz" = "latest"
+
+[env]
+PROJECT_NAME = "{{ config_root | basename }}"
+_.file = { path = ".env" }
+
+[settings]
+auto_install = false
+lockfile = true
+
+[tasks]
+[tasks.build]
+description = "Build workspace crates"
+usage = '''
+arg "[features]" default="luau,lua52,lua53,lua54,luajit,cfxlua" help="Cargo features (comma-separated)"
+flag "-r --release" help="Build in release mode"
+complete "features" run="echo luau lua52 lua53 lua54 luajit cfxlua | tr ' ' '\n'"
+'''
+run = "cargo build ${usage_release:+--release} --features ${usage_features?}"
+sources = ["**/*.rs", "**/Cargo.toml", "**/Cargo.lock"]
+
+[tasks.format]
+description = "Check formatting. Exits non-zero if unformatted."
+run = "cargo fmt --all -- --check"
+sources = ["**/*.rs"]
+
+[tasks.format-fix]
+description = "Apply rustfmt to all crates"
+run = "cargo fmt --all"
+
+[tasks.lint]
+description = "Run Clippy on all targets with all features. Fails on any warning."
+run = "cargo clippy --all-targets --all-features -- -D warnings"
+sources = ["**/*.rs", "**/Cargo.toml"]
+
+[tasks.test]
+description = "Run tests via cargo nextest"
+usage = '''
+arg "[features]" default="luau,lua52,lua53,lua54,luajit,cfxlua" help="Cargo features (comma-separated)"
+complete "features" run="echo luau lua52 lua53 lua54 luajit cfxlua | tr ' ' '\n'"
+'''
+run = "cargo nextest run --features ${usage_features?}"
+sources = ["**/*.rs", "**/Cargo.toml", "**/tests/**/*.rs"]
+
+[tasks.test-std]
+description = "Run tests with standard cargo test runner"
+usage = '''
+arg "[features]" default="luau,lua52,lua53,lua54,luajit,cfxlua" help="Cargo features (comma-separated)"
+complete "features" run="echo luau lua52 lua53 lua54 luajit cfxlua | tr ' ' '\n'"
+'''
+run = "cargo test --features ${usage_features?}"
+
+[tasks.snapshots]
+description = "Interactively review and accept insta snapshot changes"
+run = "cargo insta review --workspace-root {{config_root}}"
+raw = true
+
+[tasks.snapshots-update]
+description = "Bulk-accept all insta snapshot changes"
+usage = '''
+arg "[features]" default="luau,lua52,lua53,lua54,luajit,cfxlua" help="Cargo features"
+complete "features" run="echo luau lua52 lua53 lua54 luajit cfxlua | tr ' ' '\n'"
+'''
+run = "INSTA_UPDATE=always cargo test --features ${usage_features?}"
+
+[tasks.doc]
+description = "Build rustdoc with cfg docsrs"
+usage = '''
+arg "[features]" default="luau,lua52,lua53,lua54,luajit,cfxlua" help="Cargo features"
+complete "features" run="echo luau lua52 lua53 lua54 luajit cfxlua | tr ' ' '\n'"
+'''
+run = "RUSTDOCFLAGS='--cfg docsrs' cargo doc --features ${usage_features?} --no-deps"
+sources = ["**/*.rs", "**/Cargo.toml"]
+
+[tasks.doc-open]
+description = "Build docs and open in browser"
+usage = '''
+arg "[features]" default="luau,lua52,lua53,lua54,luajit,cfxlua" help="Cargo features"
+complete "features" run="echo luau lua52 lua53 lua54 luajit cfxlua | tr ' ' '\n'"
+'''
+run = "RUSTDOCFLAGS='--cfg docsrs' cargo doc --features ${usage_features?} --no-deps --open"
+
+[tasks.fuzz-parse]
+description = "Fuzz the parser target"
+usage = 'flag "-t --timeout <seconds>" default="30" help="Max total seconds per run"'
+run = "cargo fuzz run parse -- -max_total_time=${usage_timeout?}"
+dir = "full-moon/fuzz"
+
+[tasks.fuzz-parity]
+description = "Fuzz the parser parity target"
+usage = 'flag "-t --timeout <seconds>" default="30" help="Max total seconds per run"'
+run = "cargo fuzz run parse_parity -- -max_total_time=${usage_timeout?}"
+dir = "full-moon/fuzz"
+
+[tasks.fuzz]
+description = "Run both fuzz targets sequentially"
+depends = ["fuzz-parse", "fuzz-parity"]
+
+[tasks.bench]
+description = "Run criterion benchmarks"
+run = "cargo bench"
+sources = ["benches/**/*.rs", "benches/**/*.lua"]
+
+[tasks.verify]
+description = "Pre-push: format check + lint + test + build"
+depends = ["format", "lint", "test", "build"]
+
+[tasks.ci]
+description = "Full CI: format + lint + test + build + doc"
+depends = ["format", "lint", "test", "build", "doc"]
