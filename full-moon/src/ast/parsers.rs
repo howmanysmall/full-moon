@@ -174,7 +174,7 @@ fn parse_stmt(state: &mut ParserState) -> ParserResult<StmtVariant> {
                     ParserResult::Value(StmtVariant::Stmt(ast::Stmt::LocalFunction(local_function)))
                 }
 
-          _ => {
+                _ => {
                     state.token_error(
                         next_token.clone(),
                         "expected either a variable name or `function`",
